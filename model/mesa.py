@@ -1,3 +1,5 @@
+from model.excepciones import MesaOcupadaException
+
 class Mesa:
     """
     Representa una mesa del restaurante con su estado y control de apertura.
@@ -28,12 +30,15 @@ class Mesa:
         return self._tiene_pedido_abierto
 
     def abrir_mesa(self) -> bool:
-        """Abre la mesa para nuevos clientes cambiando su estado."""
-        if not self._tiene_pedido_abierto:
-            self._tiene_pedido_abierto = True
-            self._estado = "Ocupada"
-            return True
-        return False
+        """
+        Abre la mesa para nuevos clientes cambiando su estado a 'Ocupada'.
+        Lanza MesaOcupadaException si la mesa ya está ocupada o tiene un pedido activo.
+        """
+        if self._tiene_pedido_abierto or self._estado == "Ocupada":
+            raise MesaOcupadaException(f"Regla de Negocio: La Mesa #{self._numero} ya está ocupada.")
+        self._tiene_pedido_abierto = True
+        self._estado = "Ocupada"
+        return True
 
     def cerrar_mesa(self) -> bool:
         """Cierra la mesa liberándola."""

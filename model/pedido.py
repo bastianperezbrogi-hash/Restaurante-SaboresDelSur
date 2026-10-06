@@ -4,10 +4,11 @@ from model.mesa import Mesa
 from model.itemmenu import ItemMenu
 from model.detallepedido import DetallePedido
 from model.boleta import Boleta
+from model.excepciones import StockInsuficienteException, PedidoCerradoException
 
 class Pedido:
     """
-    Representa una comanda o pedido en el restaurante.
+    Representa una comanda o pedido en el restaurante (Transacción Principal).
     Posee relación de composición con DetallePedido, y asociaciones con Mesa, Mesero y Boleta.
     """
     def __init__(self, numero_pedido: int, mesa: Mesa, mesero=None, id_pedido: int = None):
@@ -60,29 +61,43 @@ class Pedido:
     def detalles(self) -> List[DetallePedido]:
         return self._detalles
 
-    def agregar_detalle(self, item: ItemMenu, cant: int, obs: str = "") -> bool:
+    def agregar_detalle(self, item: ItemMenu, cant: int, obs: str = "") -> DetallePedido:
         """
         Agrega una línea de detalle al pedido (Composición) y descuenta insumos.
+        Lanza excepciones de negocio si el pedido está cerrado o si no hay stock.
         """
-        if self._estado == "Abierto" and item.verificar_stock_ingredientes():
-            for ing in item.ingredientes:
-                ing.descontar_stock(cant)
-            detalle = DetallePedido(item_menu=item, cantidad=cant, observacion=obs)
-            self._detalles.append(detalle)
-            return True
-        return False
+        if self._estado != "Abierto":
+            raise PedidoCerradoException(f"Regla de Negocio: No se pueden agregar ítems al Pedido #{self._numero_pedido} porque está {self._estado}.")
+
+        # Validar y descontar stock de ingredientes asociados
+        for ing in item.ingredientes:
+            if not ing.tiene_stock_suficiente(cant):
+                raise StockInsuficienteException(
+                    f"Regla de Negocio: Stock insuficiente del ingrediente '{ing.nombre}' "
+                    f"(Disponible: {ing.stock_actual}, Requerido: {cant}) para '{item.nombre}'."
+                )
+
+        # Descontar stock tras validación exitosa
+        for ing in item.ingredientes:
+            ing.descontar_stock(cant)
+
+        # Creación interna del detalle (Composición: el todo crea la parte)
+        detalle = DetallePedido(item_menu=item, cantidad=cant, observacion=obs)
+        self._detalles.append(detalle)
+        return detalle
 
     def calcular_total(self) -> int:
         """Calcula el total sumando el subtotal de cada línea de detalle."""
         return sum(detalle.calcular_subtotal() for detalle in self._detalles)
 
-    def cerrar_pedido(self, rut_cliente: str = "12345678-5") -> Optional[Boleta]:
+    def cerrar_pedido(self, rut_cliente: str = "12345678-5") -> Boleta:
         """Cierra el pedido, genera y asocia la Boleta y libera la mesa."""
-        if self._estado == "Abierto":
-            self._estado = "Cerrado"
-            total = self.calcular_total()
-            self._boleta = Boleta(numero_boleta=self._numero_pedido + 1000, rut_cliente=rut_cliente, monto_total=total)
-            if self._mesa:
-                self._mesa.cerrar_mesa()
-            return self._boleta
-        return None
+        if self._estado != "Abierto":
+            raise PedidoCerradoException(f"El Pedido #{self._numero_pedido} ya se encuentra cerrado.")
+
+        self._estado = "Cerrado"
+        total = self.calcular_total()
+        self._boleta = Boleta(numero_boleta=self._numero_pedido + 1000, rut_cliente=rut_cliente, monto_total=total)
+        if self._mesa:
+            self._mesa.cerrar_mesa()
+        return self._boleta

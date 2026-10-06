@@ -1,15 +1,16 @@
-import re
+from model.excepciones import RutInvalidoException
 
 class Boleta:
     """
     Representa el comprobante tributario emitido al cerrar un pedido.
-    Incluye validación formal del RUT chileno del cliente.
+    Aplica encapsulamiento estricto con validación formal de RUT chileno (Módulo 11) en su setter.
     """
     def __init__(self, numero_boleta: int, rut_cliente: str, monto_total: int, id_boleta: int = None):
         self._id = id_boleta
         self._numero_boleta = numero_boleta
-        self._rut_cliente = rut_cliente
         self._monto_total = monto_total
+        # Invoca al setter con validación
+        self.rut_cliente = rut_cliente
 
     @property
     def id(self) -> int:
@@ -27,6 +28,13 @@ class Boleta:
     def rut_cliente(self) -> str:
         return self._rut_cliente
 
+    @rut_cliente.setter
+    def rut_cliente(self, valor: str):
+        """Valida el RUT usando el algoritmo Módulo 11 antes de asignarlo."""
+        if not self.validar_rut(valor):
+            raise RutInvalidoException(f"Validación Fallida: El RUT '{valor}' no es un RUT chileno válido según Módulo 11.")
+        self._rut_cliente = valor
+
     @property
     def monto_total(self) -> int:
         return self._monto_total
@@ -35,10 +43,13 @@ class Boleta:
     def monto_total(self, valor: int):
         self._monto_total = valor
 
-    def validar_rut(self, rut: str) -> bool:
+    @staticmethod
+    def validar_rut(rut: str) -> bool:
         """
         Valida el RUT chileno mediante el algoritmo de Módulo 11.
         """
+        if not rut or not isinstance(rut, str):
+            return False
         rut_limpio = rut.replace(".", "").replace("-", "").strip().upper()
         if len(rut_limpio) < 2:
             return False
@@ -68,6 +79,4 @@ class Boleta:
 
     def emitir_documento(self) -> bool:
         """Emite la boleta validando el RUT y el monto."""
-        if self.validar_rut(self._rut_cliente) and self._monto_total > 0:
-            return True
-        return False
+        return self.validar_rut(self._rut_cliente) and self._monto_total > 0
