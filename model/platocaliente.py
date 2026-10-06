@@ -1,8 +1,14 @@
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.itemmenu import ItemMenu
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.itemmenu import ItemMenu
+except ImportError:
+    from itemmenu import ItemMenu
 
 
 class PlatoCaliente(ItemMenu):

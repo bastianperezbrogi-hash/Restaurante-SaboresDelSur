@@ -1,14 +1,24 @@
-import sys
 import os
+import sys
 from typing import List, Optional
 from datetime import datetime
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.mesa import Mesa
-from model.itemmenu import ItemMenu
-from model.detallepedido import DetallePedido
-from model.boleta import Boleta
-from model.excepciones import StockInsuficienteException, PedidoCerradoException
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.mesa import Mesa
+    from model.itemmenu import ItemMenu
+    from model.detallepedido import DetallePedido
+    from model.boleta import Boleta
+    from model.excepciones import StockInsuficienteException, PedidoCerradoException
+except ImportError:
+    from mesa import Mesa
+    from itemmenu import ItemMenu
+    from detallepedido import DetallePedido
+    from boleta import Boleta
+    from excepciones import StockInsuficienteException, PedidoCerradoException
 
 
 class Pedido:
@@ -121,5 +131,3 @@ class Pedido:
         if self._mesa:
             self._mesa.cerrar_mesa()
         return self._boleta
-
-

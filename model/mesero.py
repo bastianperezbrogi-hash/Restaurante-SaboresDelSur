@@ -1,10 +1,18 @@
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.trabajador import Trabajador
-from model.mesa import Mesa
-from model.pedido import Pedido
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.trabajador import Trabajador
+    from model.mesa import Mesa
+    from model.pedido import Pedido
+except ImportError:
+    from trabajador import Trabajador
+    from mesa import Mesa
+    from pedido import Pedido
 
 
 class Mesero(Trabajador):
@@ -20,9 +28,7 @@ class Mesero(Trabajador):
             mesa.abrir_mesa()
         return Pedido(numero_pedido=numero_pedido, mesa=mesa, mesero=self, cliente=cliente)
 
-
     def marcar_mesa(self, mesa: Mesa, estado: str) -> bool:
         """Actualiza el estado de una mesa."""
         mesa.estado = estado
         return True
-

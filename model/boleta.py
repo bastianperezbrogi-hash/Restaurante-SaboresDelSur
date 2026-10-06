@@ -1,8 +1,14 @@
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.excepciones import RutInvalidoException
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.excepciones import RutInvalidoException
+except ImportError:
+    from excepciones import RutInvalidoException
 
 
 class Boleta:
@@ -42,7 +48,6 @@ class Boleta:
     def rut_cliente(self) -> str:
         return self._rut_cliente
 
-
     @rut_cliente.setter
     def rut_cliente(self, valor: str):
         """Valida el RUT usando el algoritmo Módulo 11 antes de asignarlo."""
@@ -68,7 +73,6 @@ class Boleta:
         rut_limpio = rut.replace(".", "").replace("-", "").replace(" ", "").strip().upper()
         if len(rut_limpio) < 2:
             return False
-
 
         cuerpo = rut_limpio[:-1]
         dv = rut_limpio[-1]

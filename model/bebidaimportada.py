@@ -1,8 +1,14 @@
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.bebida import Bebida
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.bebida import Bebida
+except ImportError:
+    from bebida import Bebida
 
 
 class BebidaImportada(Bebida):
@@ -30,7 +36,8 @@ class BebidaImportada(Bebida):
     def cotizar_segun_dolar(self, valor_dolar_dia: float) -> int:
         """Actualiza la cotización del día y retorna el precio en CLP."""
         self._valor_dolar_dia = float(valor_dolar_dia)
-        return int(round(self._precio_usd * self._valor_dolar_dia))
+        self._precio_base = int(round(self._precio_usd * self._valor_dolar_dia))
+        return self._precio_base
 
     def calcular_precio(self) -> int:
         """

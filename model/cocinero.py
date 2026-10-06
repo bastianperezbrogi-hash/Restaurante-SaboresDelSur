@@ -1,8 +1,14 @@
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.trabajador import Trabajador
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.trabajador import Trabajador
+except ImportError:
+    from trabajador import Trabajador
 
 
 class Cocinero(Trabajador):
@@ -28,4 +34,3 @@ class Cocinero(Trabajador):
     def marcar_listo(self, detalle) -> bool:
         """Marca una línea de detalle como lista."""
         return detalle.marcar_como_listo()
-

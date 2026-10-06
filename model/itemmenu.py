@@ -1,9 +1,15 @@
-import sys
 import os
+import sys
 from typing import List
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.ingrediente import Ingrediente
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.ingrediente import Ingrediente
+except ImportError:
+    from ingrediente import Ingrediente
 
 
 class ItemMenu:
@@ -62,7 +68,6 @@ class ItemMenu:
     @property
     def ingredientes(self) -> List[Ingrediente]:
         return self._ingredientes
-
 
     def agregar_ingrediente(self, ingrediente: Ingrediente):
         """Agrega un ingrediente a la lista de ingredientes del ítem."""

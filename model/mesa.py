@@ -1,8 +1,14 @@
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-from model.excepciones import MesaOcupadaException
+_dir_padre = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _dir_padre not in sys.path:
+    sys.path.insert(0, _dir_padre)
+
+try:
+    from model.excepciones import MesaOcupadaException
+except ImportError:
+    from excepciones import MesaOcupadaException
 
 
 class Mesa:
@@ -33,7 +39,6 @@ class Mesa:
     @tiene_pedido_abierto.setter
     def tiene_pedido_abierto(self, valor: bool):
         self._tiene_pedido_abierto = bool(valor)
-
 
     def verificar_pedido_abierto(self) -> bool:
         """Retorna si la mesa cuenta con un pedido actualmente en curso."""
