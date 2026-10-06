@@ -431,7 +431,7 @@ def menu_crud_mesas(mesa_dao: MesaDao):
                 if nuevo_estado == "Disponible":
                     m.cerrar_mesa()
                 elif nuevo_estado == "Ocupada":
-                    m._tiene_pedido_abierto = True
+                    m.tiene_pedido_abierto = True
                 mesa_dao.actualizar(m)
                 print(f"Mesa #{num} actualizada a estado: '{m.estado}'.")
             except ValueError:
@@ -515,16 +515,15 @@ def main():
                     mesa_bd = Mesa(numero=num_mesa)
                     mesa_dao.insertar(mesa_bd)
 
-                try:
-                    mesa_bd.abrir_mesa()
-                except MesaOcupadaException as e:
-                    print(f"\n[Aviso] {e}")
-                    conf_abrir = input("¿Desea continuar con un nuevo pedido en esta mesa? (s/n): ").strip().lower()
+                if mesa_bd.tiene_pedido_abierto or mesa_bd.estado == "Ocupada":
+                    print(f"\n[Aviso] La Mesa #{mesa_bd.numero} ya figura como '{mesa_bd.estado}'.")
+                    conf_abrir = input("¿Desea reabrirla para un nuevo pedido? (s/n): ").strip().lower()
                     if conf_abrir != 's':
                         continue
+                    mesa_bd.cerrar_mesa()
 
-                mesa_dao.actualizar(mesa_bd)
                 pedido = mesero.tomar_pedido(mesa_bd, numero_pedido=301)
+                mesa_dao.actualizar(mesa_bd)
                 print(f"Pedido #{pedido.numero_pedido} abierto por {mesero.nombre}. Mesa #{mesa_bd.numero} estado: {mesa_bd.estado}")
 
                 while True:
@@ -571,21 +570,29 @@ def main():
                     print(f"-> Plato '{det.item_menu.nombre}' preparado por {cocinero.nombre}.")
 
                 print("\n--- CIERRE Y EMISIÓN DE BOLETA ---")
-                rut_in = input("Ingrese RUT del cliente para la boleta (ej: 12.345.678-5): ").strip()
-                try:
-                    boleta = pedido.cerrar_pedido(rut_cliente=rut_in)
-                    mesa_dao.actualizar(mesa_bd)
-                    print(f"\n¡BOLETA #{boleta.numero_boleta} EMITIDA CON ÉXITO!")
-                    print(f"Cliente: {boleta.rut_cliente}")
-                    print(f"Monto Total: ${boleta.monto_total:,} CLP")
-                    print(f"Mesa #{mesa_bd.numero} ahora queda: {mesa_bd.estado}")
-                except (RutInvalidoException, PedidoCerradoException) as e:
-                    print(f"\n[!] Error en emisión de boleta: {e}")
-                    mesa_bd.cerrar_mesa()
-                    mesa_dao.actualizar(mesa_bd)
+                while True:
+                    rut_in = input("Ingrese RUT del cliente para la boleta (ej: 12.345.678-5): ").strip()
+                    try:
+                        boleta = pedido.cerrar_pedido(rut_cliente=rut_in)
+                        mesa_dao.actualizar(mesa_bd)
+                        print(f"\n¡BOLETA #{boleta.numero_boleta} EMITIDA CON ÉXITO!")
+                        print(f"Cliente: {boleta.rut_cliente}")
+                        print(f"Monto Total: ${boleta.monto_total:,} CLP")
+                        print(f"Mesa #{mesa_bd.numero} ahora queda: {mesa_bd.estado}")
+                        break
+                    except RutInvalidoException as e:
+                        print(f"\n[!] Error en emisión de boleta: {e}")
+                        reint = input("¿Desea reintentar con otro RUT? (s/n): ").strip().lower()
+                        if reint != 's':
+                            print("El pedido permanece abierto.")
+                            break
+                    except PedidoCerradoException as e:
+                        print(f"\n[!] Error en emisión de boleta: {e}")
+                        break
 
             except ValueError:
                 print("Error: Entrada numérica no válida.")
+
 
         elif opcion == "7":
             print("\n--- VALORES ECONÓMICOS EN TIEMPO REAL (MINDICADOR.CL) ---")

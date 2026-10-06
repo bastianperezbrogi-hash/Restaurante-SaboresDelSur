@@ -21,13 +21,25 @@ class Ingrediente:
     def nombre(self) -> str:
         return self._nombre
 
+    @nombre.setter
+    def nombre(self, valor: str):
+        self._nombre = valor
+
     @property
     def stock_actual(self) -> int:
         return self._stock_actual
 
+    @stock_actual.setter
+    def stock_actual(self, valor: int):
+        self._stock_actual = max(0, int(valor))
+
     @property
     def es_clave(self) -> bool:
         return self._es_clave
+
+    @es_clave.setter
+    def es_clave(self, valor: bool):
+        self._es_clave = bool(valor)
 
     def tiene_stock_suficiente(self, cantidad_requerida: int = 1) -> bool:
         """Verifica si hay stock suficiente del ingrediente."""
@@ -39,3 +51,4 @@ class Ingrediente:
             self._stock_actual -= cantidad
             return True
         return False
+

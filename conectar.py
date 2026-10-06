@@ -1,10 +1,15 @@
-import sqlite3  # Importa el módulo sqlite3 para interactuar con bases de datos SQLite
+import os
+import sqlite3
 
-def crear_conexion():  # Define la función encargada de establecer la conexión
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "restaurante.db")
+
+def crear_conexion(db_path: str = DB_PATH):
     """
     Crea y retorna una conexión a la base de datos SQLite 'restaurante.db'.
     Habilita el uso de Foreign Keys (claves foráneas) por defecto.
     """
-    conexion = sqlite3.connect("restaurante.db")  # Crea la conexión a la base de datos 'restaurante.db'
-    conexion.execute("PRAGMA foreign_keys = ON")  # Habilita el soporte para claves foráneas
-    return conexion  # Retorna el objeto de conexión
+    conexion = sqlite3.connect(db_path)
+    conexion.execute("PRAGMA foreign_keys = ON")
+    return conexion
+

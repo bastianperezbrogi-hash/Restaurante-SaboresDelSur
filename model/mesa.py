@@ -25,6 +25,11 @@ class Mesa:
     def tiene_pedido_abierto(self) -> bool:
         return self._tiene_pedido_abierto
 
+    @tiene_pedido_abierto.setter
+    def tiene_pedido_abierto(self, valor: bool):
+        self._tiene_pedido_abierto = bool(valor)
+
+
     def verificar_pedido_abierto(self) -> bool:
         """Retorna si la mesa cuenta con un pedido actualmente en curso."""
         return self._tiene_pedido_abierto

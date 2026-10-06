@@ -1,28 +1,20 @@
-class Cocinero:
+from model.trabajador import Trabajador
+
+class Cocinero(Trabajador):
     """
-    Subclase de Trabajador (o clase Cocinero) encargada de preparar y despachar pedidos.
+    Subclase de Trabajador encargada de preparar y despachar pedidos.
     """
     def __init__(self, rut: str, nombre: str, estacion_asignada: str = "Cocina Principal"):
-        self._rut = rut
-        self._nombre = nombre
-        self._rol = "Cocinero"
+        super().__init__(rut, nombre, "Cocinero")
         self._estacion_asignada = estacion_asignada
-
-    @property
-    def rut(self) -> str:
-        return self._rut
-
-    @property
-    def nombre(self) -> str:
-        return self._nombre
-
-    @property
-    def rol(self) -> str:
-        return self._rol
 
     @property
     def estacion_asignada(self) -> str:
         return self._estacion_asignada
+
+    @estacion_asignada.setter
+    def estacion_asignada(self, valor: str):
+        self._estacion_asignada = valor
 
     def preparar_plato(self, detalle) -> bool:
         """Inicia la preparación de un plato en la estación asignada."""
@@ -31,3 +23,4 @@ class Cocinero:
     def marcar_listo(self, detalle) -> bool:
         """Marca una línea de detalle como lista."""
         return detalle.marcar_como_listo()
+

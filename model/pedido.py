@@ -69,6 +69,9 @@ class Pedido:
         if self._estado != "Abierto":
             raise PedidoCerradoException(f"Regla de Negocio: No se pueden agregar ítems al Pedido #{self._numero_pedido} porque está {self._estado}.")
 
+        if cant <= 0:
+            raise ValueError("La cantidad debe ser mayor a 0.")
+
         # Validar y descontar stock de ingredientes asociados
         for ing in item.ingredientes:
             if not ing.tiene_stock_suficiente(cant):
@@ -95,9 +98,12 @@ class Pedido:
         if self._estado != "Abierto":
             raise PedidoCerradoException(f"El Pedido #{self._numero_pedido} ya se encuentra cerrado.")
 
-        self._estado = "Cerrado"
         total = self.calcular_total()
-        self._boleta = Boleta(numero_boleta=self._numero_pedido + 1000, rut_cliente=rut_cliente, monto_total=total)
+        # Se valida e instancia la Boleta antes de cambiar el estado del Pedido
+        boleta_emitida = Boleta(numero_boleta=self._numero_pedido + 1000, rut_cliente=rut_cliente, monto_total=total)
+        self._boleta = boleta_emitida
+        self._estado = "Cerrado"
         if self._mesa:
             self._mesa.cerrar_mesa()
         return self._boleta
+

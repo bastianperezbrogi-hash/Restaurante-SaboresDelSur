@@ -50,9 +50,10 @@ class Boleta:
         """
         if not rut or not isinstance(rut, str):
             return False
-        rut_limpio = rut.replace(".", "").replace("-", "").strip().upper()
+        rut_limpio = rut.replace(".", "").replace("-", "").replace(" ", "").strip().upper()
         if len(rut_limpio) < 2:
             return False
+
 
         cuerpo = rut_limpio[:-1]
         dv = rut_limpio[-1]

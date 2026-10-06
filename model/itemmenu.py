@@ -26,21 +26,38 @@ class ItemMenu:
     def nombre(self) -> str:
         return self._nombre
 
+    @nombre.setter
+    def nombre(self, valor: str):
+        self._nombre = valor
+
     @property
     def precio_base(self) -> int:
         return self._precio_base
+
+    @precio_base.setter
+    def precio_base(self, valor: int):
+        self._precio_base = valor
 
     @property
     def tiempo_preparacion(self) -> int:
         return self._tiempo_preparacion
 
+    @tiempo_preparacion.setter
+    def tiempo_preparacion(self, valor: int):
+        self._tiempo_preparacion = valor
+
     @property
     def estacion_cocina(self) -> str:
         return self._estacion_cocina
 
+    @estacion_cocina.setter
+    def estacion_cocina(self, valor: str):
+        self._estacion_cocina = valor
+
     @property
     def ingredientes(self) -> List[Ingrediente]:
         return self._ingredientes
+
 
     def agregar_ingrediente(self, ingrediente: Ingrediente):
         """Agrega un ingrediente a la lista de ingredientes del ítem."""

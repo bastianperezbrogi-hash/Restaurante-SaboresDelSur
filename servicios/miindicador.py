@@ -21,4 +21,9 @@ class MiIndicador:
         respuesta = requests.get(url, timeout=self.__timeout)
         respuesta.raise_for_status()
         datos = respuesta.json()
-        return float(datos["serie"][0]["valor"])
+        if "serie" in datos and len(datos["serie"]) > 0:
+            return float(datos["serie"][0]["valor"])
+        elif "valor" in datos:
+            return float(datos["valor"])
+        raise ValueError(f"No se pudo extraer el valor para el indicador '{codigo}'.")
+
