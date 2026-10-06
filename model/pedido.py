@@ -1,10 +1,15 @@
+import sys
+import os
 from typing import List, Optional
 from datetime import datetime
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from model.mesa import Mesa
 from model.itemmenu import ItemMenu
 from model.detallepedido import DetallePedido
 from model.boleta import Boleta
 from model.excepciones import StockInsuficienteException, PedidoCerradoException
+
 
 class Pedido:
     """

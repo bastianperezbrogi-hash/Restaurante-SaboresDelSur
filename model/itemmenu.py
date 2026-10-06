@@ -1,5 +1,10 @@
+import sys
+import os
 from typing import List
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from model.ingrediente import Ingrediente
+
 
 class ItemMenu:
     """

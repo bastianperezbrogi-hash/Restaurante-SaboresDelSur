@@ -1,6 +1,11 @@
+import sys
+import os
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from model.trabajador import Trabajador
 from model.mesa import Mesa
 from model.pedido import Pedido
+
 
 class Mesero(Trabajador):
     """

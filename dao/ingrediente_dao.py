@@ -1,6 +1,11 @@
+import sys
+import os
 from typing import List, Optional
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from dao.dao import Dao
 from model.ingrediente import Ingrediente
+
 
 class IngredienteDao(Dao):
     """
