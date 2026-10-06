@@ -11,9 +11,10 @@ class Pedido:
     Representa una comanda o pedido en el restaurante (Transacción Principal).
     Posee relación de composición con DetallePedido, y asociaciones con Mesa, Mesero y Boleta.
     """
-    def __init__(self, numero_pedido: int, mesa: Mesa, mesero=None, id_pedido: int = None):
+    def __init__(self, numero_pedido: int, mesa: Mesa, mesero=None, cliente: str = "Cliente", id_pedido: int = None):
         self._id = id_pedido
         self._numero_pedido = numero_pedido
+        self._cliente = cliente
         self._fecha_hora = datetime.now()
         self._estado = "Abierto"
         self._mesa = mesa
@@ -32,6 +33,14 @@ class Pedido:
     @property
     def numero_pedido(self) -> int:
         return self._numero_pedido
+
+    @property
+    def cliente(self) -> str:
+        return self._cliente
+
+    @cliente.setter
+    def cliente(self, valor: str):
+        self._cliente = valor
 
     @property
     def fecha_hora(self) -> datetime:
@@ -93,17 +102,19 @@ class Pedido:
         """Calcula el total sumando el subtotal de cada línea de detalle."""
         return sum(detalle.calcular_subtotal() for detalle in self._detalles)
 
-    def cerrar_pedido(self, rut_cliente: str = "12345678-5") -> Boleta:
+    def cerrar_pedido(self, rut_cliente: str = "12345678-5", nombre_cliente: str = None) -> Boleta:
         """Cierra el pedido, genera y asocia la Boleta y libera la mesa."""
         if self._estado != "Abierto":
             raise PedidoCerradoException(f"El Pedido #{self._numero_pedido} ya se encuentra cerrado.")
 
         total = self.calcular_total()
+        nom = nombre_cliente if nombre_cliente else self._cliente
         # Se valida e instancia la Boleta antes de cambiar el estado del Pedido
-        boleta_emitida = Boleta(numero_boleta=self._numero_pedido + 1000, rut_cliente=rut_cliente, monto_total=total)
+        boleta_emitida = Boleta(numero_boleta=self._numero_pedido + 1000, rut_cliente=rut_cliente, monto_total=total, nombre_cliente=nom)
         self._boleta = boleta_emitida
         self._estado = "Cerrado"
         if self._mesa:
             self._mesa.cerrar_mesa()
         return self._boleta
+
 

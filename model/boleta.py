@@ -5,10 +5,11 @@ class Boleta:
     Representa el comprobante tributario emitido al cerrar un pedido.
     Aplica encapsulamiento estricto con validación formal de RUT chileno (Módulo 11) en su setter.
     """
-    def __init__(self, numero_boleta: int, rut_cliente: str, monto_total: int, id_boleta: int = None):
+    def __init__(self, numero_boleta: int, rut_cliente: str, monto_total: int, nombre_cliente: str = "Cliente", id_boleta: int = None):
         self._id = id_boleta
         self._numero_boleta = numero_boleta
         self._monto_total = monto_total
+        self._nombre_cliente = nombre_cliente
         # Invoca al setter con validación
         self.rut_cliente = rut_cliente
 
@@ -25,8 +26,17 @@ class Boleta:
         return self._numero_boleta
 
     @property
+    def nombre_cliente(self) -> str:
+        return self._nombre_cliente
+
+    @nombre_cliente.setter
+    def nombre_cliente(self, valor: str):
+        self._nombre_cliente = valor
+
+    @property
     def rut_cliente(self) -> str:
         return self._rut_cliente
+
 
     @rut_cliente.setter
     def rut_cliente(self, valor: str):

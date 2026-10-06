@@ -84,8 +84,8 @@ def demostracion_evaluacion_sumativa_2():
     ing_carne = Ingrediente(nombre="Carne Vacuno", stock_actual=10, es_clave=True)
     plato.agregar_ingrediente(ing_carne)
 
-    pedido_demo = mesero_demo.tomar_pedido(mesa_demo, numero_pedido=201)
-    print(f"  -> Pedido #{pedido_demo.numero_pedido} abierto por el mesero {mesero_demo.nombre} para Mesa #{mesa_demo.numero}.")
+    pedido_demo = mesero_demo.tomar_pedido(mesa_demo, numero_pedido=201, cliente="Ana Morales")
+    print(f"  -> Pedido #{pedido_demo.numero_pedido} a nombre de '{pedido_demo.cliente}' abierto por el mesero {mesero_demo.nombre} para Mesa #{mesa_demo.numero}.")
 
     pedido_demo.agregar_detalle(item=plato, cant=2, obs="Bien caliente y sin sal")
     pedido_demo.agregar_detalle(item=postre, cant=1, obs="Con salsa de caramelo")
@@ -100,7 +100,8 @@ def demostracion_evaluacion_sumativa_2():
     print(f"  -> Comanda preparada por {cocinero_demo.nombre} ({cocinero_demo.estacion_asignada}).")
 
     boleta_final = pedido_demo.cerrar_pedido(rut_cliente="12.345.678-5")
-    print(f"  -> Transacción cerrada: Boleta #{boleta_final.numero_boleta} emitida por ${boleta_final.monto_total:,} CLP. Mesa #{mesa_demo.numero} liberada.")
+    print(f"  -> Transacción cerrada: Boleta #{boleta_final.numero_boleta} a nombre de '{boleta_final.nombre_cliente}' emitida por ${boleta_final.monto_total:,} CLP. Mesa #{mesa_demo.numero} liberada.")
+
 
     # -------------------------------------------------------------
     # 4. DOS REGLAS DE NEGOCIO PROVOCADAS Y CAPTURADAS CON TRY/EXCEPT
@@ -556,12 +557,12 @@ def _agregar_items_a_pedido(pedido: Pedido, menu_items: list):
 def _cerrar_y_emitir_boleta(pedido: Pedido, mesa_bd: Mesa, mesa_dao: MesaDao):
     print("\n--- CIERRE Y EMISIÓN DE BOLETA ---")
     while True:
-        rut_in = input("Ingrese RUT del cliente para la boleta (ej: 12.345.678-5): ").strip()
+        rut_in = input(f"Ingrese RUT de {pedido.cliente} para la boleta (ej: 12.345.678-5): ").strip()
         try:
             boleta = pedido.cerrar_pedido(rut_cliente=rut_in)
             mesa_dao.actualizar(mesa_bd)
             print(f"\n¡BOLETA #{boleta.numero_boleta} EMITIDA CON ÉXITO!")
-            print(f"Cliente: {boleta.rut_cliente}")
+            print(f"Cliente: {boleta.nombre_cliente} (RUT: {boleta.rut_cliente})")
             print(f"Monto Total: ${boleta.monto_total:,} CLP")
             print(f"Mesa #{mesa_bd.numero} ahora queda: {mesa_bd.estado}")
             break
@@ -592,9 +593,11 @@ def _procesar_pedido_interactivo(mesa_dao: MesaDao, mesero: Mesero, cocinero: Co
                 return
             mesa_bd.cerrar_mesa()
 
-        pedido = mesero.tomar_pedido(mesa_bd, numero_pedido=301)
+        nom_cliente = input("Nombre del cliente a cargo del pedido: ").strip() or "Cliente"
+        pedido = mesero.tomar_pedido(mesa_bd, numero_pedido=301, cliente=nom_cliente)
         mesa_dao.actualizar(mesa_bd)
-        print(f"Pedido #{pedido.numero_pedido} abierto por {mesero.nombre}. Mesa #{mesa_bd.numero} estado: {mesa_bd.estado}")
+        print(f"Pedido #{pedido.numero_pedido} a nombre de '{pedido.cliente}' abierto por {mesero.nombre}. Mesa #{mesa_bd.numero} estado: {mesa_bd.estado}")
+
 
         _agregar_items_a_pedido(pedido, menu_items)
 
