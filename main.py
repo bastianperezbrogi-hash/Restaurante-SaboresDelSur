@@ -656,10 +656,9 @@ def _mostrar_carta(menu_items: list):
 
 
 def main():
-    demostracion_evaluacion_sumativa_2()
-
     conn = conectar.crear_conexion()
     mesa_dao = MesaDao(conn)
+
     ingrediente_dao = IngredienteDao(conn)
     item_dao = ItemMenuDao(conn)
     indicador = MiIndicador()
